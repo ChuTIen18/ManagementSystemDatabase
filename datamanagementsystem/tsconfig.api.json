@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "lib": ["ES2020"],
+    "outDir": "dist/api",
+    "noEmit": false,
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["src/shared/*"],
+      "@api/*": ["src/api/*"]
+    }
+  },
+  "include": ["src/api/**/*", "src/database/**/*", "src/shared/**/*"],
+  "exclude": ["node_modules"]
+}
