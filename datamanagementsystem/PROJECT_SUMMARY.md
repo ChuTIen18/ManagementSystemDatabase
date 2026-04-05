@@ -125,7 +125,7 @@ Repository hoàn chỉnh cho Desktop Application quản lý quán cà phê đã 
 node setup-project.js
 ```
 
-Script này sẽ:
+Script này sẽ chay plapla :
 - ✅ Tự động tạo TẤT CẢ subfolder
 - ✅ Tự động di chuyển files vào đúng vị trí
 - ✅ Báo cáo kết quả chi tiết
