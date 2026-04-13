@@ -1,10 +1,12 @@
 import express from 'express';
 import { createServer } from '../api/server';
+import { initMysql } from '../api/services/mysql';
 
 let apiServer: any = null;
 
 export async function startAPIServer(): Promise<any> {
   try {
+    await initMysql();
     const app = createServer();
     const port = process.env.API_PORT || 3001;
 

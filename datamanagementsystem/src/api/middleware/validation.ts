@@ -3,8 +3,9 @@ import Joi from 'joi';
 
 export function validateLogin(req: Request, res: Response, next: NextFunction) {
   const schema = Joi.object({
-    username: Joi.string().required().min(3),
+    identifier: Joi.string().required().min(3),
     password: Joi.string().required().min(6),
+    role: Joi.string().valid('staff', 'pos', 'manager').required(),
   });
 
   const { error } = schema.validate(req.body);
