@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find datamanagementsystem/src/renderer/components/ui/ -name '*.tsx' -exec sed -i 's/@radix-ui\\\\/\\\\\\([a-z-]*\\\\\\)@[0-9.]*/@radix-ui\\\\/\\\\1/g;:*)",
+      "Bash(npm run *)"
+    ]
+  }
+}
