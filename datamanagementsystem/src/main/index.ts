@@ -24,7 +24,28 @@ async function createWindow() {
 
   // Load renderer
   if (isDev) {
-    await mainWindow.loadURL('http://localhost:3000');
+    // Try multiple ports that Vite might use
+    const portsToTry = [3000, 3001, 3002, 3003, 3004, 3005];
+    let connected = false;
+
+    for (const port of portsToTry) {
+      try {
+        await mainWindow.loadURL(`http://localhost:${port}`);
+        console.log(`Successfully connected to Vite dev server on port ${port}`);
+        connected = true;
+        break;
+      } catch (e) {
+        console.log(`Failed to connect to port ${port}, trying next...`);
+        continue;
+      }
+    }
+
+    if (!connected) {
+      // Fallback to first port and show error in devtools
+      await mainWindow.loadURL('http://localhost:3000');
+      console.warn('Could not connect to Vite dev server on any port');
+    }
+
     mainWindow.webContents.openDevTools();
   } else {
     await mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
