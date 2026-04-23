@@ -16,7 +16,7 @@ export function createServer(): Application {
   // Middleware
   app.use(helmet());
   app.use(cors({
-    origin: true,
+    origin: process.env.NODE_ENV === 'development' ? '*' : 'http://localhost:3000',
     credentials: true,
   }));
   app.use(express.json());
