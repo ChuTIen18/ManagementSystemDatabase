@@ -68,23 +68,6 @@ export function LoginRoleSelection({ onRoleSelect }: LoginRoleSelectionProps) {
     },
   ];
 
-  const validAccounts = {
-    manager: [
-      { email: "manager@coffeehouse.com", password: "123456" },
-      { email: "admin@coffeehouse.com", password: "admin123" },
-    ],
-    staff: [
-      { username: "demo", password: "123456" },
-      { username: "staff01", password: "123456" },
-      { username: "nhanvien", password: "123456" },
-    ],
-    pos: [
-      { username: "demo", password: "123456" },
-      { username: "pos01", password: "123456" },
-      { username: "maypos", password: "123456" },
-    ],
-  };
-
   const handleLogin = async () => {
     if (!selectedRole || !username || !password) {
       setLoginError("Vui lòng nhập đầy đủ thông tin");
@@ -94,47 +77,61 @@ export function LoginRoleSelection({ onRoleSelect }: LoginRoleSelectionProps) {
     setIsLoading(true);
     setLoginError("");
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    let isValid = false;
-
-    if (selectedRole === "manager") {
-      isValid = validAccounts.manager.some(
-        (account) =>
-          account.email === username && account.password === password,
+    try {
+      // Call actual API to login
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL || "http://localhost:3001"}/api/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            identifier: username,
+            password: password,
+            role: selectedRole,
+          }),
+        },
       );
-    } else {
-      const accounts = validAccounts[selectedRole];
-      isValid = accounts.some(
-        (account) =>
-          account.username === username && account.password === password,
-      );
-    }
 
-    setIsLoading(false);
+      const data = await response.json();
 
-    if (isValid) {
-      setLoginError("");
-      // Show success notification before redirecting
-      const roleLabel =
-        selectedRole === "manager"
-          ? "Quản lý"
-          : selectedRole === "staff"
-            ? "Nhân viên"
-            : "POS";
-      setSuccessMessage(`Đăng nhập thành công với tài khoản ${roleLabel}!`);
-      setLoginSuccess(true);
+      if (!response.ok) {
+        throw new Error(
+          data?.error?.message || "Đăng nhập thất bại. Vui lòng thử lại.",
+        );
+      }
 
-      // Redirect after showing success message
-      setTimeout(() => {
-        onRoleSelect(selectedRole);
-      }, 1500);
-    } else {
+      if (data.success && data.data?.token && data.data?.user) {
+        setLoginError("");
+        const roleLabel =
+          selectedRole === "manager"
+            ? "Quản lý"
+            : selectedRole === "staff"
+              ? "Nhân viên"
+              : "POS";
+        setSuccessMessage(`Đăng nhập thành công với tài khoản ${roleLabel}!`);
+        setLoginSuccess(true);
+
+        // Call onRoleSelect to set auth in store via parent component
+        setTimeout(() => {
+          onRoleSelect(selectedRole, data.data.token, data.data.user);
+        }, 1500);
+      } else {
+        throw new Error("Phản hồi từ server không hợp lệ");
+      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Đăng nhập thất bại. Vui lòng thử lại.";
+
       setLoginError(
         selectedRole === "manager"
-          ? "Gmail hoặc mật khẩu không đúng. Vui lòng kiểm tra lại."
-          : "Tên đăng nhập hoặc mật khẩu không đúng. Vui lòng kiểm tra lại.",
+          ? `Gmail hoặc mật khẩu không đúng. ${errorMessage}`
+          : `Tên đăng nhập hoặc mật khẩu không đúng. ${errorMessage}`,
       );
+      setIsLoading(false);
     }
   };
 
@@ -525,16 +522,6 @@ export function LoginRoleSelection({ onRoleSelect }: LoginRoleSelectionProps) {
                 <p className="text-xs text-gray-600">
                   Option 1: Username:
                   <code className="text-green-600 text-xs ml-1 font-mono">
-                    demo
-                  </code>{" "}
-                  | Mật khẩu:
-                  <code className="text-green-600 text-xs ml-1 font-mono">
-                    123456
-                  </code>
-                </p>
-                <p className="text-xs text-gray-600">
-                  Option 2: Username:
-                  <code className="text-green-600 text-xs ml-1 font-mono">
                     staff01
                   </code>{" "}
                   | Mật khẩu:
@@ -543,7 +530,7 @@ export function LoginRoleSelection({ onRoleSelect }: LoginRoleSelectionProps) {
                   </code>
                 </p>
                 <p className="text-xs text-gray-600">
-                  Option 3: Username:
+                  Option 2: Username:
                   <code className="text-green-600 text-xs ml-1 font-mono">
                     pos01
                   </code>{" "}

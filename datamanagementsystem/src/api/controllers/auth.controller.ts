@@ -123,9 +123,9 @@ export class AuthController {
       const [result] = await pool.query<ResultSetHeader>(
         `
           INSERT INTO users (username, email, password, role, full_name, is_active)
-          VALUES (?, ?, ?, ?, ?, true)
+          VALUES (?, ?, ?, ?, ?, ?)
         `,
-        [username, email, hashedPassword, role, fullName || null]
+        [username, email, hashedPassword, role, fullName || null, true]
       );
 
       const [createdRows] = await pool.query<RowDataPacket[]>(
