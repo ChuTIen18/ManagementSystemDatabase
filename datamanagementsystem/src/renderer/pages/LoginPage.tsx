@@ -29,7 +29,7 @@ export default function LoginPage() {
   const handleRoleSelect = (
     role: "staff" | "pos" | "manager",
     token: string,
-    userData: any,
+    userData: any
   ): void => {
     // Set user authentication with data from API
     setAuth({
