@@ -26,19 +26,22 @@ export default function LoginPage() {
     }
   }, [user, navigate]);
 
-  const handleRoleSelect = (role: "staff" | "pos" | "manager"): void => {
-    // Set user authentication with mock data
-    // In a real application, this would come from an actual login API call
+  const handleRoleSelect = (
+    role: "staff" | "pos" | "manager",
+    token: string,
+    userData: any
+  ): void => {
+    // Set user authentication with data from API
     setAuth({
-      token: 'mock-token',
+      token: token,
       user: {
-        id: 1,
-        username: role,
-        email: `${role}@coffeehouse.com`,
-        role: role,
-        fullName: `${role.charAt(0).toUpperCase() + role.slice(1)} User`,
-        isActive: true
-      }
+        id: userData.id,
+        username: userData.username,
+        email: userData.email,
+        role: userData.role,
+        fullName: userData.fullName,
+        isActive: userData.isActive,
+      },
     });
     // Navigation will happen via the useEffect above
   };

@@ -104,8 +104,10 @@ export function StaffDashboard() {
           <AttendanceOnly />
         </TabsContent>
 
-        <TabsContent value="schedule">
-          <PersonalSchedule />
+        <TabsContent value="schedule" className="mt-4">
+          <div className="border rounded-lg p-4">
+            <PersonalSchedule />
+          </div>
         </TabsContent>
 
         <TabsContent value="invoices">

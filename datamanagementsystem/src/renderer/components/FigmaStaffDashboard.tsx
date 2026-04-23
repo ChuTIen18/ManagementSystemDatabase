@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { PersonalSchedule } from "./PersonalSchedule";
 import {
   Clock,
   Calendar,
@@ -17,6 +18,8 @@ import {
   LogOut,
 } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
+import { StaffInvoiceProcessing } from "./StaffInvoiceProcessing";
+import { StaffReports } from "./StaffReports";
 
 interface AttendanceRecord {
   date: number;
@@ -57,7 +60,7 @@ export function FigmaStaffDashboard() {
         now.toLocaleTimeString("vi-VN", {
           hour: "2-digit",
           minute: "2-digit",
-        })
+        }),
       );
     };
     updateTime();
@@ -148,7 +151,10 @@ export function FigmaStaffDashboard() {
               <Star className="h-3.5 w-3.5" />
               Demo Đánh giá
             </button>
-            <button className="px-3 py-1.5 text-xs font-medium text-gray-700 rounded hover:bg-gray-50 flex items-center gap-1" onClick={handleLogout}>
+            <button
+              className="px-3 py-1.5 text-xs font-medium text-gray-700 rounded hover:bg-gray-50 flex items-center gap-1"
+              onClick={handleLogout}
+            >
               <LogOut className="h-3.5 w-3.5" />
               Đăng xuất
             </button>
@@ -276,7 +282,9 @@ export function FigmaStaffDashboard() {
                   <p className="text-xs text-red-600 mt-1">Tiền phạt</p>
                 </div>
                 <div className="text-center p-3 bg-purple-50 rounded-lg">
-                  <p className="text-xl font-bold text-purple-600">4,700,000đ</p>
+                  <p className="text-xl font-bold text-purple-600">
+                    4,700,000đ
+                  </p>
                   <p className="text-xs text-purple-600 mt-1">Tổng lương</p>
                 </div>
               </div>
@@ -357,7 +365,9 @@ export function FigmaStaffDashboard() {
                         <p className="text-sm font-medium text-gray-900">
                           {record.date}
                         </p>
-                        <p className="text-xs text-gray-500">{record.dayOfWeek}</p>
+                        <p className="text-xs text-gray-500">
+                          {record.dayOfWeek}
+                        </p>
                       </div>
                       <div>
                         <p className="text-sm font-medium text-gray-900">
@@ -412,21 +422,15 @@ export function FigmaStaffDashboard() {
 
           {/* Placeholder for other tabs */}
           <TabsContent value="schedule" className="mt-6">
-            <Card className="p-8 border border-gray-200 text-center">
-              <p className="text-gray-500">Nội dung lịch làm việc</p>
-            </Card>
+            <PersonalSchedule />
           </TabsContent>
 
           <TabsContent value="invoices" className="mt-6">
-            <Card className="p-8 border border-gray-200 text-center">
-              <p className="text-gray-500">Nội dung hóa đơn</p>
-            </Card>
+            <StaffInvoiceProcessing />
           </TabsContent>
 
           <TabsContent value="reports" className="mt-6">
-            <Card className="p-8 border border-gray-200 text-center">
-              <p className="text-gray-500">Nội dung báo cáo</p>
-            </Card>
+            <StaffReports />
           </TabsContent>
         </Tabs>
       </div>
