@@ -11,13 +11,13 @@ export default function LoginPage() {
   useEffect(() => {
     if (user) {
       switch (user.role) {
-        case 'staff':
+        case "staff":
           navigate("/staff/dashboard", { replace: true });
           break;
-        case 'pos':
+        case "pos":
           navigate("/pos/dashboard", { replace: true });
           break;
-        case 'manager':
+        case "manager":
           navigate("/manager/dashboard", { replace: true });
           break;
         default:
@@ -29,7 +29,7 @@ export default function LoginPage() {
   const handleRoleSelect = (
     role: "staff" | "pos" | "manager",
     token: string,
-    userData: any
+    userData: any,
   ): void => {
     // Set user authentication with data from API
     setAuth({
@@ -46,9 +46,5 @@ export default function LoginPage() {
     // Navigation will happen via the useEffect above
   };
 
-  return (
-    <LoginRoleSelection
-      onRoleSelect={handleRoleSelect}
-    />
-  );
+  return <LoginRoleSelection onRoleSelect={handleRoleSelect} />;
 }
