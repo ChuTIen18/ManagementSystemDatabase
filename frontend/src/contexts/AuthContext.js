@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         // Do not auto-check the current user while rendering the login page.
         // Calling /auth/me on /login without a valid session can trigger refresh/redirect loops
-        // that repeatedly remount the login UI and make the page hard to interact with.
+        // and browser 401 console noise.
         if (window.location.pathname === '/login') {
             setIsLoading(false);
             return;

@@ -25,16 +25,34 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const API_PREFIX = process.env.API_PREFIX || '/api/v1';
 
-const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173,http://127.0.0.1:5173')
+const allowedOrigins = (
+    process.env.CORS_ORIGINS ||
+    process.env.CORS_ORIGIN ||
+    'http://localhost:5173,http://127.0.0.1:5173,http://localhost:8080,http://127.0.0.1:8080'
+)
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);
+
+const isNgrokOrigin = (origin: string) => {
+    try {
+        const { hostname } = new URL(origin);
+        return (
+            hostname.endsWith('.ngrok-free.app') ||
+            hostname.endsWith('.ngrok-free.dev') ||
+            hostname.endsWith('.ngrok.app') ||
+            hostname.endsWith('.ngrok.dev')
+        );
+    } catch {
+        return false;
+    }
+};
 
 // Middleware
 app.use(
     cors({
         origin(origin: string | undefined, callback: (error: Error | null, allow?: boolean) => void) {
-            if (!origin || allowedOrigins.includes(origin)) {
+            if (!origin || allowedOrigins.includes(origin) || isNgrokOrigin(origin)) {
                 callback(null, true);
                 return;
             }

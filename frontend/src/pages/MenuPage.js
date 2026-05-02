@@ -21,17 +21,6 @@ const MenuPage = () => {
     });
     const { user } = useAuth();
     const isManager = user?.role === 'manager';
-    const normalizeList = (payload) => {
-        if (Array.isArray(payload))
-            return payload;
-        if (Array.isArray(payload?.items))
-            return payload.items;
-        if (Array.isArray(payload?.data))
-            return payload.data;
-        if (Array.isArray(payload?.rows))
-            return payload.rows;
-        return [];
-    };
     const fetchMenu = async () => {
         try {
             setLoading(true);
@@ -44,7 +33,7 @@ const MenuPage = () => {
                 params.availableOnly = true;
             }
             const response = await menuAPI.getAll(params);
-            setItems(normalizeList(response.data));
+            setItems(response.data || []);
         }
         catch (err) {
             setError(err.response?.data?.error?.message || 'Failed to fetch menu');

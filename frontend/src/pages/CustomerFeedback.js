@@ -19,22 +19,11 @@ export default function CustomerFeedback() {
     });
     const { user } = useAuth();
     const isManager = user?.role === 'manager';
-    const normalizeList = (payload) => {
-        if (Array.isArray(payload))
-            return payload;
-        if (Array.isArray(payload?.items))
-            return payload.items;
-        if (Array.isArray(payload?.data))
-            return payload.data;
-        if (Array.isArray(payload?.rows))
-            return payload.rows;
-        return [];
-    };
     const fetchFeedbacks = async () => {
         try {
             setLoading(true);
             const response = await feedbackAPI.getCustomerAll();
-            setFeedbacks(normalizeList(response.data));
+            setFeedbacks(response.data || []);
         }
         catch (err) {
             setError(err.response?.data?.error?.message || 'Failed to load customer feedback');
