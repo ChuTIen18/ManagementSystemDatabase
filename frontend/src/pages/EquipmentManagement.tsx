@@ -23,6 +23,16 @@ interface User {
     name: string;
 }
 
+const getResponseList = <T,>(payload: any): T[] => {
+    if (Array.isArray(payload)) return payload;
+    if (Array.isArray(payload?.data)) return payload.data;
+    if (Array.isArray(payload?.data?.items)) return payload.data.items;
+    if (Array.isArray(payload?.items)) return payload.items;
+    if (Array.isArray(payload?.users)) return payload.users;
+    if (Array.isArray(payload?.equipment)) return payload.equipment;
+    return [];
+};
+
 export default function EquipmentManagement() {
     const [equipment, setEquipment] = useState<Equipment[]>([]);
     const [loading, setLoading] = useState(false);
@@ -63,9 +73,7 @@ export default function EquipmentManagement() {
             if (filterStatus) params.status = filterStatus;
             if (filterType) params.type = filterType;
             const response = await equipmentAPI.getAll(params);
-            if (response.data) {
-                setEquipment(response.data);
-            }
+            setEquipment(getResponseList<Equipment>(response.data));
         } catch (err: any) {
             setError(err.response?.data?.error?.message || 'Failed to fetch equipment');
         } finally {
@@ -77,9 +85,7 @@ export default function EquipmentManagement() {
     const fetchUsers = async () => {
         try {
             const response = await usersAPI.getAll();
-            if (response.data) {
-                setUsers(response.data);
-            }
+            setUsers(getResponseList<User>(response.data));
         } catch (err) {
             console.error('Failed to fetch users');
         }

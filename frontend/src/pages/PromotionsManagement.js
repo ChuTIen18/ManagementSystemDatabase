@@ -33,7 +33,13 @@ export default function PromotionsManagement() {
             setLoading(true);
             setError('');
             const response = await promotionsAPI.getAll();
-            setPromotions(response.data || []);
+            const payload = response?.data;
+            const promotionsList = Array.isArray(payload)
+                ? payload
+                : Array.isArray(payload?.data)
+                    ? payload.data
+                    : [];
+            setPromotions(promotionsList);
         }
         catch (err) {
             setError(err.response?.data?.error?.message || 'Failed to load promotions');

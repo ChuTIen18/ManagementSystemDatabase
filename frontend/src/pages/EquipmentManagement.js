@@ -17,6 +17,17 @@ export default function EquipmentManagement() {
     const [users, setUsers] = useState([]);
     const { user } = useAuth();
     const isManager = user?.role === 'manager';
+    const normalizeList = (payload) => {
+        if (Array.isArray(payload))
+            return payload;
+        if (Array.isArray(payload?.items))
+            return payload.items;
+        if (Array.isArray(payload?.data))
+            return payload.data;
+        if (Array.isArray(payload?.rows))
+            return payload.rows;
+        return [];
+    };
     const [maintenanceData, setMaintenanceData] = useState({
         maintenance_type: '',
         description: '',
@@ -42,9 +53,7 @@ export default function EquipmentManagement() {
             if (filterType)
                 params.type = filterType;
             const response = await equipmentAPI.getAll(params);
-            if (response.data) {
-                setEquipment(response.data);
-            }
+            setEquipment(normalizeList(response.data));
         }
         catch (err) {
             setError(err.response?.data?.error?.message || 'Failed to fetch equipment');
@@ -57,9 +66,7 @@ export default function EquipmentManagement() {
     const fetchUsers = async () => {
         try {
             const response = await usersAPI.getAll();
-            if (response.data) {
-                setUsers(response.data);
-            }
+            setUsers(normalizeList(response.data));
         }
         catch (err) {
             console.error('Failed to fetch users');

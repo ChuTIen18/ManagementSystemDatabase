@@ -9,10 +9,29 @@ export const AuthProvider = ({ children }) => {
     const [error, setError] = useState(null);
     // Check if user is already logged in (either in-memory token or refresh cookie)
     useEffect(() => {
+        // Do not auto-check the current user while rendering the login page.
+        // Calling /auth/me on /login without a valid session can trigger refresh/redirect loops
+        // that repeatedly remount the login UI and make the page hard to interact with.
+        if (window.location.pathname === '/login') {
+            setIsLoading(false);
+            return;
+        }
+        // Avoid calling /auth/me when there is no local auth hint.
+        // A first anonymous visit should not generate expected 401s in the browser console.
+        if (!tokenStore.getToken() && !localStorage.getItem('role')) {
+            setIsLoading(false);
+            return;
+        }
         // Attempt to fetch current user. If access token is present in-memory, requests will include it.
         // If only a refresh cookie is present, server-side refresh will issue a new access token and the request will retry.
         fetchCurrentUser();
     }, []);
+    // Ensure protected routes can render immediately after a successful login update.
+    useEffect(() => {
+        if (user) {
+            setIsLoading(false);
+        }
+    }, [user]);
     const fetchCurrentUser = async () => {
         try {
             const response = await authAPI.getMe();

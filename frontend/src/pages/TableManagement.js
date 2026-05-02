@@ -19,11 +19,22 @@ export default function TableManagement() {
     });
     const { user } = useAuth();
     const isManager = user?.role === 'manager';
+    const normalizeList = (payload) => {
+        if (Array.isArray(payload))
+            return payload;
+        if (Array.isArray(payload?.items))
+            return payload.items;
+        if (Array.isArray(payload?.data))
+            return payload.data;
+        if (Array.isArray(payload?.rows))
+            return payload.rows;
+        return [];
+    };
     const fetchTables = async () => {
         try {
             setLoading(true);
             const response = await tablesAPI.getAll(filterAvailableOnly ? { available_only: 'true' } : undefined);
-            setTables(response.data || []);
+            setTables(normalizeList(response.data));
         }
         catch (err) {
             setError(err.response?.data?.error?.message || 'Failed to load tables');
