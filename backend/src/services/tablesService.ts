@@ -39,15 +39,25 @@ export const tablesService = {
         }
     },
 
+    // Generate QR code for table
+    generateQRCode(tableNumber: string): string {
+        const timestamp = Date.now().toString(36).toUpperCase();
+        const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+        return `COFFEE-T${tableNumber}-${timestamp}-${random}`;
+    },
+
     // Create table
     async createTable(data: { tableNumber: string; capacity: number; qrCode?: string }) {
         try {
             const connection = await pool.getConnection();
 
+            // Auto-generate QR code if not provided
+            const qrCode = data.qrCode || this.generateQRCode(data.tableNumber);
+
             const result = await connection.query(
                 `INSERT INTO TABLES (table_number, capacity, qr_code)
                  VALUES (?, ?, ?)`,
-                [data.tableNumber, data.capacity, data.qrCode || null]
+                [data.tableNumber, data.capacity, qrCode]
             );
 
             const tableId = (result[0] as any).insertId;

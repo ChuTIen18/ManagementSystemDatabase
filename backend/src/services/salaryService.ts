@@ -68,10 +68,17 @@ export const salaryService = {
             const deductions = input.deductions || 0;
             const netSalary = baseSalary + bonus - deductions;
 
-            // Insert salary record
-            const [result]: any = await connection.query(
+            // Upsert salary record to allow recalculation for existing month/year
+            await connection.query(
                 `INSERT INTO SALARY (user_id, month, year, total_hours, base_salary, bonus, deductions, net_salary, notes)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 ON DUPLICATE KEY UPDATE
+                    total_hours = VALUES(total_hours),
+                    base_salary = VALUES(base_salary),
+                    bonus = VALUES(bonus),
+                    deductions = VALUES(deductions),
+                    net_salary = VALUES(net_salary),
+                    notes = VALUES(notes)`,
                 [
                     input.user_id,
                     input.month,
@@ -87,11 +94,10 @@ export const salaryService = {
 
             connection.release();
 
-            const salaryId = result.insertId;
-            const salary = await this.getSalaryById(salaryId);
+            const salary = await this.getSalaryByUserMonthYear(input.user_id, input.month, input.year);
 
             console.log(
-                `[SALARY SERVICE] Salary calculated: User ${input.user_id}, ${input.month}/${input.year}, Hours: ${totalHours}`
+                `[SALARY SERVICE] Salary calculated (upsert): User ${input.user_id}, ${input.month}/${input.year}, Hours: ${totalHours}`
             );
             return salary as Salary;
         } catch (error: any) {

@@ -45,18 +45,8 @@ export const salaryController = {
                 });
             }
 
-            // Check if salary already exists
-            const existing = await salaryService.getSalaryByUserMonthYear(user_id, month, year);
-            if (existing) {
-                return res.status(400).json({
-                    error: {
-                        code: 'SALARY_EXISTS',
-                        message: 'Salary already calculated for this month',
-                    },
-                });
-            }
-
-            // Calculate salary
+            // Calculate or recalculate salary. The service performs an UPSERT
+            // on (user_id, month, year), so repeated calls update the existing row.
             const salary = await salaryService.calculateSalary({
                 user_id,
                 month,

@@ -58,9 +58,48 @@ export const menuController = {
         }
     },
 
+    // POST /api/v1/menu/upload-image
+    async uploadMenuImage(req: AuthRequest, res: Response) {
+        try {
+            const file = (req as any).file;
+            if (!file) {
+                return res.status(400).json({
+                    error: {
+                        code: 'VALIDATION_ERROR',
+                        message: 'Image file is required',
+                    },
+                });
+            }
+
+            const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
+            const imageUrl = `/uploads/menu/${Date.now()}-${safeName}`;
+
+            return res.status(201).json({
+                data: {
+                    imageUrl,
+                    filename: safeName,
+                    mimetype: file.mimetype,
+                    size: file.size,
+                },
+                message: 'Image validated successfully',
+            });
+        } catch (error: any) {
+            return res.status(500).json({
+                error: {
+                    code: 'INTERNAL_ERROR',
+                    message: error.message,
+                },
+            });
+        }
+    },
+
     // POST /api/v1/menu
     async createMenuItem(req: AuthRequest, res: Response) {
         try {
+            const file = (req as any).file;
+            const uploadedImageUrl = file
+                ? `/uploads/menu/${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_')}`
+                : undefined;
             const { name, category, price, cost, description, imageUrl } = req.body;
 
             if (!name || !category || !price) {
@@ -78,7 +117,7 @@ export const menuController = {
                 price,
                 cost,
                 description,
-                imageUrl,
+                imageUrl: uploadedImageUrl || imageUrl,
             });
 
             return res.status(201).json({ data: item });
@@ -96,7 +135,14 @@ export const menuController = {
     async updateMenuItem(req: AuthRequest, res: Response) {
         try {
             const { id } = req.params;
-            const data = req.body;
+            const file = (req as any).file;
+            const uploadedImageUrl = file
+                ? `/uploads/menu/${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_')}`
+                : undefined;
+            const data = {
+                ...req.body,
+                ...(uploadedImageUrl ? { imageUrl: uploadedImageUrl } : {}),
+            };
 
             const item = await menuService.updateMenuItem(parseInt(id), data);
 
